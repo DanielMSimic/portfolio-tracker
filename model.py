@@ -40,3 +40,8 @@ def create_asset(Ticker, qty_purchased, purchase_price):
     }
 
     return asset
+
+
+def get_history(Ticker, start_date, end_date):
+    history = yf.Ticker(Ticker).history(start=start_date, end=end_date)
+    return history

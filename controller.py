@@ -1,8 +1,7 @@
 # controller.py
 
-# import datetime
-
-from model import create_asset
+import datetime
+from model import create_asset, get_history
 from view import print_asset_added
 
 def run_portfolio_CLI():
@@ -192,7 +191,124 @@ def run_portfolio_CLI():
                 print(f"TOTAL P&L:                 {tot_pnl_abs:,.2f}")
                 print(f"TOTAL P&L %:               {tot_pnl_pct:.2%}")
 
+        
+        # ALLOCATION command.
+        elif command == "allocation":
+            if not portfolio:
+                print("Portfolio is empty. Add assets, or see 'help' for more information.")
+                continue
+            else:
+                tot_curr_val = sum(asset['Current Value'] for asset in portfolio)             # Sums over all Current Value keys in the Asset dictionary for all assets in the portfolio list. Same as before. 
+
+            tot_sector_val = {}
+            tot_class_val = {}
+
+            for asset in portfolio:
+                sector = asset["Sector"]
+                asset_class = asset["Asset Class"]
+            
+                if sector not in tot_sector_val:
+                    tot_sector_val[sector] = 0
                 
+                tot_sector_val[sector] += asset['Current Value']
+                    
+
+                if asset_class not in tot_class_val:
+                    tot_class_val[asset_class] = 0 
+
+                tot_class_val[asset_class] += asset["Current Value"]
+
+
+            width = 65
+            print()
+            print("Allocation by SECTOR".center(width))
+            print()
+            print(f"{'SECTOR':<30}  |  {'POSITION':>15}  |  {'WEIGHT':>8}  ")
+            print(f"{'=' * 65}")
+            for sector, value in tot_sector_val.items():
+                print(f"{sector:<30}  |  {value:>15,.2f}  |  {value / tot_curr_val:8.2%}")
+            print(f"{'-' * 65}")
+
+            print()
+            
+            print("Allocation by ASSET CLASS".center(width))
+            print()
+            print(f"{'ASSET CLASS':<30}  |  {'POSITION':>15}  |  {'WEIGHT':>8}  ")
+            print(f"{'=' * 65}")
+            for asset_class, value in tot_class_val.items():
+                print(f"{asset_class:<30}  |  {value:>15,.2f}  |  {value / tot_curr_val:8.2%}")
+            print(f"{'-' * 65}")
+
+
+        # REMOVE command.
+        elif command == "remove":
+            if not portfolio:
+                print("Portfolio is empty. Add an asset first, or see 'help' for more information.")
+                continue
+            
+            remove_asset = input("Enter ticker of the asset you would like to remove ALL positions for. This action cannot be undone: ").strip().upper()
+
+            
+            #print(f"Remove all {remove_asset} positions? (y/n)")
+            confirm_remove = input(f'Remove all {remove_asset} positions? (y/n)').strip().lower()
+            if confirm_remove == "y":
+                original_len = len(portfolio)                   # Grabbing length of the list, to check later if something was actually removed.
+
+
+                portfolio = [asset for asset in portfolio if asset.get("Ticker") != remove_asset]         # Rebuild the list but only with those dictionaries that do not include the TICKER that we want to remove. 
+                if len(portfolio) < original_len:                                                         # Grab original number of assets (so not unique) in the portfolio and see if the REMOVE command actually removed an asset.
+                    print(f"Removed {remove_asset} from portfolio.")                                      # If it did remove an asset, print the removal confirmation.
+                else:
+                    print(f"{remove_asset} not found in current portfolio.")                              # If nothing was removed, inform user the asset was not found. 
+            else:
+                print("Removal cancelled.")
+            
+        # HISTORY command.
+        elif command == "history":
+            Ticker = input("Enter ticker: ").strip().upper()
+
+            cancel_history = False
+            while True:
+                user_start_date = input("Enter start date (yyyy-mm-dd) or 'back' to return: ").strip().lower()
+                if user_start_date == 'back':
+                    cancel_history = True
+                    break
+                    
+                user_end_date = input("Enter end date (yyyy-mm-dd) or 'back' to return: ").strip().lower()
+                if user_end_date == 'back':
+                    cancel_history = True
+                    break
+                    
+                try:
+                    start_date = datetime.datetime.strptime(user_start_date, "%Y-%m-%d")
+                    end_date = datetime.datetime.strptime(user_end_date, "%Y-%m-%d")
+                    if end_date <= start_date:
+                        print("End date cannot be before start date. Please try again.")
+                        continue
+                    
+                    break
+                except ValueError:
+                    print("Invalid date format. Please try again.")
+
+            if cancel_history:
+                print("Asset history cancelled.")
+                continue
+            
+            # Actual historical data pull from YAHOO FIN.
+            history = get_history(Ticker, start_date, end_date)
+
+            # Printing time series, with option to print full custom period or just the last 25 rows.
+            if history.empty:
+                print("No historical data available.")
+            else:
+                print(f"Retrieved {len(history)} rows.")
+                show_all = input("Show full history? Else the 25 most recent entries will be shown. (y/n): ").strip().lower()
+                if show_all == "y":
+                    print(history[["Open", "High", "Low", "Close", "Volume"]].to_string())
+                else:
+                    print(history[["Open", "High", "Low", "Close", "Volume"]].tail(25).to_string())
+
+        
         
         else:
             print("Unknown command. Type 'help' for available commands.")
