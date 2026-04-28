@@ -1,7 +1,10 @@
 # controller.py
 
 import datetime
-from model import create_asset, get_history, validate_ticker
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
+from model import create_asset, get_history, validate_ticker, get_plot_history, sim_gbm_paths
 from view import print_asset_added
 
 def run_portfolio_CLI():
@@ -310,6 +313,161 @@ def run_portfolio_CLI():
                     print(history[["Open", "High", "Low", "Close", "Volume"]].to_string())
                 else:
                     print(history[["Open", "High", "Low", "Close", "Volume"]].tail(25).to_string())
+
+
+        # PLOT command.
+        elif command == "plot":
+            ticker_input = input("Enter ticker(s). If adding multiple tickers, separate them by spaces: ").strip().upper()
+            plot_asset = ticker_input.split()
+
+            cancel_plot = False
+            while True:
+                user_start_date = input("Enter start date (yyyy-mm-dd) or 'back' to return: ").strip().lower()
+                if user_start_date == 'back':
+                    cancel_plot = True
+                    break
+                    
+                user_end_date = input("Enter end date (yyyy-mm-dd) or 'back' to return: ").strip().lower()
+                if user_end_date == 'back':
+                    cancel_plot = True
+                    break
+                
+                try:
+                    start_date = datetime.datetime.strptime(user_start_date, "%Y-%m-%d")
+                    end_date = datetime.datetime.strptime(user_end_date, "%Y-%m-%d")
+
+                    if end_date <= start_date:
+                        print("End date cannot be before start date. Please try again.")
+                        continue
+                    break
+     
+                except ValueError:
+                    print("Invalid date format. Please try again.")
+
+            if cancel_plot:
+                print("Asset plot cancelled.")
+                continue            
+
+            # Distinguish between single and multiple plots: split multiple (normalised for comparisson between multiple assets) from single (absolute close).
+            if len(plot_asset) == 1:
+                # PLOT SINGLE TICKER
+                plt.figure()
+                hist = get_plot_history(plot_asset[0], start_date, end_date)
+                if hist.empty:
+                    print(f"No data available for {plot_assets[0]}.")
+                    continue               
+                x_values = hist.index
+                y_values = hist["Close"]
+                
+                plt.plot(x_values, y_values, label=plot_asset[0], linewidth=2)
+                plt.fill_between(x_values, y_values, alpha=0.1)
+                plt.tight_layout()   
+                plt.title(f"Close price: {plot_asset[0]}", weight='bold')
+                #plt.grid()
+                plt.ylabel("Closing price")
+                plt.legend()
+
+                print()
+                print(f"Figure showing plot for: {plot_asset[0]} over the period {start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}.")
+                plt.show()
+
+            else:
+                # PLOTTING MULTIPLE TICKERS
+                plt.figure()
+                for asset in plot_asset:
+                    hist = get_plot_history(asset, start_date, end_date)
+    
+                    if hist.empty:
+                        print(f"No data available for {asset}.")
+                        continue
+                    
+                    x_values = hist.index
+                    y_values = hist["Close"] / hist["Close"].iloc[0]
+                    plt.plot(x_values, y_values, label=asset)
+    
+                plt.tight_layout()
+                #plt.xticks(rotation=45)
+                plt.title(f"Normalised price: {', '.join(plot_asset)}", weight='bold')
+                plt.ylabel("Normalised closing price")
+                #plt.grid()
+                plt.legend()
+
+                print()
+                print(f"Figure showing plot(s) for: {', '.join(plot_asset)} over the period {start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}.")
+                plt.show()
+
+        
+        # SIMULATE command.
+        elif command == "simulate":
+            if not portfolio:
+                print("Portfolio is empty. Unable to simulate sample paths. Add assets, or see 'help' for more information.")
+                continue
+            else:
+                tot_curr_val = sum(asset['Current Value'] for asset in portfolio)                        
+            
+            print("To simulate the upcoming 15 years for the portfolio, please specify the annualised expected return (drift) and volatlity: ")
+            user_drift_input = input("Enter expected annualised return as percentage (5 for 5%) ").strip()    
+            user_vol_input = input("Enter expected annualised volatility as percetage (10 for 10%) ").strip()
+
+            try:
+                user_drift = float(user_drift_input) / 100
+                user_vol = float(user_vol_input) / 100
+            except ValueError:
+                print("Input invalid. Please enter numeric values.")
+                continue
+
+            if user_vol < 0:
+                print("Volatility cannot be negative.")
+                continue
+            
+            
+            # Function parameters
+            P0 = tot_curr_val
+            mu = user_drift
+            sigma = user_vol
+            T = 15
+            n_steps = 252 * T
+            n_paths = 100000
+
+
+            print("Simulating 100,000 GBM paths. This may take some time...")  
+            print()
+            sample_paths = sim_gbm_paths(P0, mu, sigma, T, n_steps, n_paths)
+            print("Simulation complete. Simulated 100,000 paths x 3,780 days, generating 378 million draws.")
+
+            simulated_values = sample_paths[-1,:]   # Grabbing last element of list with simulated portfolio values. 
+
+            # Some stats on the simulated portfolio values.
+            mean_predicted_pfval = np.mean(simulated_values)
+            median_predicted_pfval = np.median(simulated_values)
+            percentile_5 = np.percentile(simulated_values, 5)
+            percentile_95 = np.percentile(simulated_values, 95)
+
+            print(f"\n{'=' * 60}")
+            print(f"  Simulation results portfolio value 15 year forecast")
+            print(f"     Annualised growth rate (μ):   {mu:.2%} ")
+            print(f"     Annualised volatility (σ):    {sigma:.2%} ")
+            print(f"{'=' * 60}")
+            
+            print(f"  Mean predicted portfolio value:      {mean_predicted_pfval:,.2f}")
+            print(f"  Median predicted portfolio value:    {median_predicted_pfval:,.2f}")            
+            print(f"  5th percentile value at risk (VaR):  {percentile_5:,.2f}")          
+            print(f"  95th percentile:                     {percentile_95:,.2f}")   
+            print(f"{'=' * 60}")
+
+            # Plotting GBM paths
+            time_horizon = np.linspace(0, T, n_steps + 1)
+            
+            for path in range(100):
+                plt.plot(time_horizon, sample_paths[:, path])
+
+            plt.title("Simulated paths of portfolio value over 15 years.")
+            plt.xlabel("Years")
+            plt.ylabel("Portfolio value (millions)")
+            plt.gca().yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _:f'{x/1_000_000:,.1f}'))
+            plt.show()
+
+
 
         
         
