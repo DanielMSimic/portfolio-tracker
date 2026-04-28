@@ -1,4 +1,6 @@
 import yfinance as yf
+import contextlib
+import io
 
 
 
@@ -45,3 +47,11 @@ def create_asset(Ticker, qty_purchased, purchase_price):
 def get_history(Ticker, start_date, end_date):
     history = yf.Ticker(Ticker).history(start=start_date, end=end_date)
     return history
+
+def validate_ticker(Ticker):
+    try:
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            data = yf.Ticker(Ticker).history(period='1d')
+        return not data.empty
+    except Exception:
+        return False

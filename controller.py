@@ -1,7 +1,7 @@
 # controller.py
 
 import datetime
-from model import create_asset, get_history
+from model import create_asset, get_history, validate_ticker
 from view import print_asset_added
 
 def run_portfolio_CLI():
@@ -100,7 +100,7 @@ def run_portfolio_CLI():
 
             try:
                 asset = create_asset(Ticker, qty_purchased, purchase_price)
-            except error:
+            except Exception:
                 print("Error retrieving asset data. Please retry.")
             
             if asset is None:
@@ -266,6 +266,9 @@ def run_portfolio_CLI():
         # HISTORY command.
         elif command == "history":
             Ticker = input("Enter ticker: ").strip().upper()
+            if not validate_ticker(Ticker):
+                print("Unable to retrieve data.")
+                continue
 
             cancel_history = False
             while True:
