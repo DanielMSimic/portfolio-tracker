@@ -31,60 +31,72 @@ add: add an asset to the portfolio. You will be prompted for ticker, quantity, a
 	Enter quantity purchased: 10000
 	Enter purchase price per unit: 260
 
-	The CLI will ask you to confirm (y/n) your entry. If (y), the CLI will return a brief confirmation that your asset has been added to the portfolio. 
+The CLI will ask you to confirm (y/n) your entry. If (y), the CLI will return a brief confirmation that your asset has been added to the portfolio. 
 
 remove: remove an asset from the current portfolio. Note, this removes ALL entries for the given ticker. In case the same ticker was added multiple times, this command removes all matching ticker entries. 
-	```
-    portfolio >> remove
-	Enter ticker of the asset you would like to remove ALL positions for. This action cannot be undone: AAPL
-	Remove all AAPL positions? (Y/n)
-	Removed AAPL from portfolio.
-    ```
+```
+portfolio >> remove
+Enter ticker of the asset you would like to remove ALL positions for. This action cannot be undone: AAPL
+Remove all AAPL positions? (Y/n)
+Removed AAPL from portfolio.
+```
 
-show: show current portfolio. If empty, you will be asked to add an asset or referred to 'help' for more information. Includes SECTOR, ASSET CLASS, PURCHASED QUANTITY (QTY), BUY PRICE (BUY PX), TRANSACTION COST (COST), CURRENT PRICE (PX), CURRENT MARKET VALUE (MKT VAL), WEIGHTS (WGT), PROFIT AND LOSS (P&L), PROFIT AND LOSS PERCENTAGE (P&L%).
-	```
-    portfolio >> show
-    ```
+show: show current portfolio. If empty, you will be asked to add an asset or referred to 'help' for more information. 
+Includes:
+- Sector
+- Asset Class
+- Purchased quantity (QTY)
+- Buy price (BUY PX)
+- Transaction cost (COST)
+- Current price (PX)
+- Current market value (MKT VAL)
+- Weights (WGT)
+- Profit and loss (P&L)
+- Profit and loss % (P&L%)
+
+```
+portfolio >> show
+```
 
 allocation: show portfolio value and weights per sector and asset class.
-    ```
-    portfolio >> allocation
-    ```
+```
+portfolio >> allocation
+```
     
 history: show historical data over a specified time period, for any valid Yahoo Finance ticker. Not limited to assets currently in the portfolio. 
-    ```
-    portfolio >> history
-    Enter ticker: ASRNL.AS
-    Enter start date: 2019-1-1
-    Enter end date: 2021-1-1
-    ```
+```
+portfolio >> history
+Enter ticker: ASRNL.AS
+Enter start date: 2019-1-1
+Enter end date: 2021-1-1
+```
 
 plot: plot price data for one or multiple assets over a specified time period.
 - Single assets (absolute prices)
 - Multiple assets (normalised prices for comparison)
-    ```
-    portfolio >> plot
-    Enter ticker(s): ASRNL.AS
-    Enter start date: 2019-1-1
-    Enter end date: 2021-1-1
-    ```
+```
+portfolio >> plot
+Enter ticker(s): ASRNL.AS
+Enter start date: 2019-1-1
+Enter end date: 2021-1-1
+```
     
 simulate: Monte-carlo simulation forecasting portfolio performance (15 years, 100k GBM paths). Outputs mean, median, value at risk (VaR) and 95th percentile data for the simulation under specified drift and volatility.
-    ```
-    portfolio >> simulate
-    Enter expected annualised return as percentage (5 for 5%): 5
-    Enter expected annualised volatility as percentage (10 for 10%): 10
-    ```
+```
+portfolio >> simulate
+Enter expected annualised return as percentage (5 for 5%): 5
+Enter expected annualised volatility as percentage (10 for 10%): 10
+```
 
 exit: close the application. 
-    ```
-    portfolio >> exit
-    ```
+```
+portfolio >> exit
+```
 
 help: open the help section to view available commands. 
-	```
-    portfolio >> help
-    ```
+```
+portfolio >> help
+```
 
 ## Notes
 - Uses Yahoo Finance (yfinance) to fetch asset data for added tickers
