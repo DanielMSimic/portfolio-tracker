@@ -86,5 +86,61 @@ def sim_wait_msg():
 def sim_complete_msg():
     print("Simulation complete. Simulated 100,000 paths x 3,780 days, generating 378 million draws.")
 
+def print_portfolio(portfolio, tot_curr_val, tot_cost, tot_pnl_abs, tot_pnl_pct):
+    # TABLE HEADER (ROW 0) FORMATTING
+    print()
+    print(
+        f"{'TICKER':<10}  |  "
+        f"{'NAME':<35}  |  "
+        f"{'SECTOR':<23}  |  "
+        f"{'CLASS':<15}  |  "
+        f"{'QTY':>17}  |  "
+        f"{'BUY PX':>12}  |  " 
+        f"{'COST':>19}  |  "
+        f"{'PX':>15}  |  "
+        f"{'MKT VAL':>19}  |  "
+        f"{'WGT':>8}  |  "
+        f"{'P&L':>17}  |  "
+        f"{'P&L %':>8}")
+                
+    print("=" * 254)  # Sets underline bar length kind of naively, manually. Maybe have this be dynamic if time allows
+                
+    for asset in portfolio:                                                       # Looping over all assets in portfolio list...
+        if tot_curr_val == 0:
+            weight = 0                                                            # Edge case, preventing division by zero. 
+        else:
+            weight =  asset["Current Value"] / tot_curr_val                       # ... accessing the key Current Value, and dividing by TOTAL CURRENT VALUE for all those assets to get the weights of all assets in the portfolio.
+
+                    
+        asset_pnl_abs = asset["Current Value"] - asset['Transaction Value']       # Calculates profit and loss for each asset: absolute difference between (current price - purchase price) * quantity purchased.
+        if asset['Transaction Value'] == 0:                                       # Edge case, preventing division by zero. 
+            asset_pnl_pct = 0
+        else:
+            asset_pnl_pct = asset_pnl_abs / asset['Transaction Value']            # Calculates profit and loss for each asset: percentage increase/decrease. 
+
+                    
+        print(                                                                    # ... and over all asset[KEY] to print.
+            f"{asset['Ticker']:<10}  |  "
+            f"{asset['Name']:<35}  |  "
+            f"{asset['Sector']:<23}  |  "
+            f"{asset['Asset Class']:<15}  |  "
+            f"{asset['Quantity']:>17,.2f}  |  "
+            f"{asset['Purchase Price']:>12,.2f}  |  "
+            f"{asset['Transaction Value']:>19,.2f}  |  "
+            f"{asset['Current Price']:>15,.2f}  |  "
+            f"{asset['Current Value']:>19,.2f}  |  "
+            f"{weight:>8.2%}  |  "
+            f"{asset_pnl_abs:>17,.2f}  |  "
+            f"{asset_pnl_pct:>8.2%}"
+        )
+                
+    print("-" * 254)
+    print()
+
+    print(f"TOTAL COST:                {tot_cost:,.2f}")
+    print(f"TOTAL PORTFOLIO VALUE:     {tot_curr_val:,.2f}")
+    print(f"TOTAL P&L:                 {tot_pnl_abs:,.2f}")
+    print(f"TOTAL P&L %:               {tot_pnl_pct:.2%}")
+
 
 
