@@ -4,6 +4,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 
+# Plot formatting for prettier graphs.
+plt.rcParams.update({
+'figure.figsize': (9, 5),
+'figure.dpi': 100,
+'font.size': 9,
+'font.family': 'sans-serif',
+'axes.spines.top': False,
+'axes.spines.right': False,
+'axes.grid': True,
+'grid.alpha': 0.3,
+    })
 
 def print_asset_added(asset):
     print(f"{asset['Ticker']} added to portfolio.")
@@ -17,10 +28,11 @@ def plot_single_asset(hist, plot_asset, start_date, end_date):
                 
     plt.plot(x_values, y_values, label=plot_asset[0], linewidth=2)
     plt.fill_between(x_values, y_values, alpha=0.1)
-    plt.tight_layout()
+    plt.tight_layout(pad=1)
     plt.title(f"Close price: {plot_asset[0]}", weight='bold')
     #plt.grid()
-    plt.ylabel("Closing price")
+    plt.xlabel("Time")
+    plt.ylabel("Price")
     plt.legend()
 
     print()
@@ -41,10 +53,11 @@ def plot_multiple_assets(plot_asset, start_date, end_date, get_plot_history):
         y_values = hist["Close"] / hist["Close"].iloc[0]
         plt.plot(x_values, y_values, label=asset)
     
-    plt.tight_layout()
+    plt.tight_layout(pad=1)
     #plt.xticks(rotation=45)
     plt.title(f"Normalised price: {', '.join(plot_asset)}", weight='bold')
-    plt.ylabel("Normalised closing price")
+    plt.xlabel("Time")
+    plt.ylabel("Normalised price")
     #plt.grid()
     plt.legend()
 
