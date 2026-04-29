@@ -79,3 +79,17 @@ def sim_gbm_paths(P0, mu, sigma, T, n_steps, n_paths):
         paths[t] = paths[t-1] * daily_pf_return[t-1]
     
     return paths
+
+def calculate_portfolio_tot(portfolio):
+    tot_curr_val = sum(asset['Current Value'] for asset in portfolio)             # Sums over all Current Value keys in the Asset dictionary for all assets in the portfolio list. Needed to calculate portfolio weights
+                
+    # Calculated profit and loss for total portfolio. 
+    tot_cost = sum(asset['Transaction Value'] for asset in portfolio)
+    tot_pnl_abs = tot_curr_val - tot_cost
+    if tot_cost == 0:
+        tot_pnl_pct = 0
+    else:
+        tot_pnl_pct = tot_pnl_abs / tot_cost
+
+    return tot_curr_val, tot_cost, tot_pnl_abs, tot_pnl_pct
+    

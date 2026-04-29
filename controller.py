@@ -4,7 +4,7 @@ import datetime
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
-from model import create_asset, get_history, validate_ticker, get_plot_history, sim_gbm_paths
+from model import create_asset, get_history, validate_ticker, get_plot_history, sim_gbm_paths, calculate_portfolio_tot
 from view import print_asset_added, plot_single_asset, plot_multiple_assets, print_sim_results, plot_sim_paths, sim_wait_msg, sim_complete_msg, print_portfolio, print_allocation
 
 def run_portfolio_CLI():
@@ -129,15 +129,7 @@ def run_portfolio_CLI():
             if not portfolio:
                 print("Portfolio is empty. Add assets, or see 'help' for more information.")
             else:
-                tot_curr_val = sum(asset['Current Value'] for asset in portfolio)             # Sums over all Current Value keys in the Asset dictionary for all assets in the portfolio list. Needed to calculate portfolio weights
-                
-                # Calculated profit and loss for total portfolio. 
-                tot_cost = sum(asset['Transaction Value'] for asset in portfolio)
-                tot_pnl_abs = tot_curr_val - tot_cost
-                if tot_cost == 0:
-                    tot_pnl_pct = 0
-                else:
-                    tot_pnl_pct = tot_pnl_abs / tot_cost
+                tot_curr_val, tot_cost, tot_pnl_abs, tot_pnl_pct = calculate_portfolio_tot(portfolio)
 
                 print_portfolio(portfolio, tot_curr_val, tot_cost, tot_pnl_abs, tot_pnl_pct)
 
@@ -148,7 +140,7 @@ def run_portfolio_CLI():
                 print("Portfolio is empty. Add assets, or see 'help' for more information.")
                 continue
             else:
-                tot_curr_val = sum(asset['Current Value'] for asset in portfolio)             # Sums over all Current Value keys in the Asset dictionary for all assets in the portfolio list. Same as before. 
+                tot_curr_val, _, _, _ = calculate_portfolio_tot(portfolio)
 
             tot_sector_val = {}
             tot_class_val = {}
