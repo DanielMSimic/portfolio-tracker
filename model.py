@@ -8,9 +8,12 @@ import io
 
 
 def create_asset(Ticker, qty_purchased, purchase_price):
-    yf_ticker = yf.Ticker(Ticker)
-
-    info = yf_ticker.info
+    try:
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            yf_ticker = yf.Ticker(Ticker)
+            info = yf_ticker.info
+    except Exception:
+        return None
 
     name = info.get('shortName', Ticker)
 
