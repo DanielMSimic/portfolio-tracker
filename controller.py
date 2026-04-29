@@ -5,14 +5,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from model import create_asset, get_history, validate_ticker, get_plot_history, sim_gbm_paths, calculate_portfolio_tot, calculate_allocation_val
-from view import print_asset_added, plot_single_asset, plot_multiple_assets, print_sim_results, plot_sim_paths, sim_wait_msg, sim_complete_msg, print_portfolio, print_allocation
+from view import print_asset_added, plot_single_asset, plot_multiple_assets, print_sim_results, plot_sim_paths, sim_wait_msg, sim_complete_msg, print_portfolio, print_allocation, help_command, welcome_msg, unknown_command_msg
 
 def run_portfolio_CLI():
     portfolio = []
 
-    print("Welcome. \nThis Portfolio Tracker allows you to view your current portfolio, add assets, and track its performance.")
-    print("Type 'help' for a full list of available commands.")
-    print("Type 'exit' to close the application, confirm by (y/n).")
+    welcome_msg()
     
     while True:
         command = input("portfolio >> ").strip().lower()       
@@ -28,46 +26,7 @@ def run_portfolio_CLI():
 
         # HELP command.
         elif command == "help":
-            print("\nPortfolio Tracker Help\n" + "-"*55)
-            print("""
-    add:          
-        Add an asset to the current portfolio. 
-        Input: >>TICKER -> QTY -> PRICE
-        Example: ASRNL.AS -> 10000 -> 60
-                
-    remove:       
-        Remove ALL entries of an asset from the current portfolio. 
-        Input: >>TICKER
-                     
-    show:         
-        Show current portfolio.
-                            
-    allocation:  
-        Show portfolio value and weights per sector and asset class. 
-                
-    history:      
-        Show historical information for a specified asset. 
-        Input: >>TICKER, >>START DATE, >>END DATE
-        Format: yyyy-mm-dd
-        Note: START DATE cannot be after END DATE
-            
-    plot:          
-        Plot price data for 1 or multiple assets.
-        Input: >>TICKER(S)
-        Format: TICKER1 TICKER2 TICKER3, separated by spaces
-        Example: ASRNL AAPL GOOG NN.NL
-        Note: single TICKER plots absolute prices, multiple TICKERS plots normalised prices. 
-                
-    simulate:     
-        Monte-carlo simulation forecasting portfolio performance (15 years, 100k GBM paths).
-        Input: 
-            annualised return. E.g. 5 for 5%
-            annualised volatility. E.g. 20 for 20
-                  
-    exit:         
-        Close the application.\n
-        
-            """)
+            help_command()
             
         # ADD command.
         elif command == "add":
@@ -324,5 +283,5 @@ def run_portfolio_CLI():
         
         
         else:
-            print("Unknown command. Type 'help' for available commands.")
+            unknown_command_msg()
 
