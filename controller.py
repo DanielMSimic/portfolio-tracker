@@ -215,7 +215,7 @@ def run_portfolio_CLI():
             if len(plot_asset) == 1:
                 # PLOT SINGLE TICKER
                 hist = get_plot_history(plot_asset[0], start_date, end_date)
-                if hist.empty or hist is None:
+                if hist is None or hist.empty:
                     print(f"No data available for {plot_asset[0]}.")
                     continue               
                 plot_single_asset(hist, plot_asset, start_date, end_date)
