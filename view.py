@@ -142,5 +142,25 @@ def print_portfolio(portfolio, tot_curr_val, tot_cost, tot_pnl_abs, tot_pnl_pct)
     print(f"TOTAL P&L:                 {tot_pnl_abs:,.2f}")
     print(f"TOTAL P&L %:               {tot_pnl_pct:.2%}")
 
+def print_allocation(tot_sector_val, tot_class_val, tot_curr_val):
+    width = 65
+    print()
+    print("Allocation by SECTOR".center(width))
+    print()
+    print(f"{'SECTOR':<30}  |  {'POSITION':>15}  |  {'WEIGHT':>8}  ")
+    print(f"{'=' * 65}")
+    for sector, value in tot_sector_val.items():
+        print(f"{sector:<30}  |  {value:>15,.2f}  |  {value / tot_curr_val:8.2%}")
+    print(f"{'-' * 65}")
+
+    print()
+            
+    print("Allocation by ASSET CLASS".center(width))
+    print()
+    print(f"{'ASSET CLASS':<30}  |  {'POSITION':>15}  |  {'WEIGHT':>8}  ")
+    print(f"{'=' * 65}")
+    for asset_class, value in tot_class_val.items():
+        print(f"{asset_class:<30}  |  {value:>15,.2f}  |  {value / tot_curr_val:8.2%}")
+    print(f"{'-' * 65}")
 
 

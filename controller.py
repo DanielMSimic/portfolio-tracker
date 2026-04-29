@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from model import create_asset, get_history, validate_ticker, get_plot_history, sim_gbm_paths
-from view import print_asset_added, plot_single_asset, plot_multiple_assets, print_sim_results, plot_sim_paths, sim_wait_msg, sim_complete_msg, print_portfolio
+from view import print_asset_added, plot_single_asset, plot_multiple_assets, print_sim_results, plot_sim_paths, sim_wait_msg, sim_complete_msg, print_portfolio, print_allocation
 
 def run_portfolio_CLI():
     portfolio = []
@@ -168,26 +168,8 @@ def run_portfolio_CLI():
 
                 tot_class_val[asset_class] += asset["Current Value"]
 
+            print_allocation(tot_sector_val, tot_class_val, tot_curr_val)
 
-            width = 65
-            print()
-            print("Allocation by SECTOR".center(width))
-            print()
-            print(f"{'SECTOR':<30}  |  {'POSITION':>15}  |  {'WEIGHT':>8}  ")
-            print(f"{'=' * 65}")
-            for sector, value in tot_sector_val.items():
-                print(f"{sector:<30}  |  {value:>15,.2f}  |  {value / tot_curr_val:8.2%}")
-            print(f"{'-' * 65}")
-
-            print()
-            
-            print("Allocation by ASSET CLASS".center(width))
-            print()
-            print(f"{'ASSET CLASS':<30}  |  {'POSITION':>15}  |  {'WEIGHT':>8}  ")
-            print(f"{'=' * 65}")
-            for asset_class, value in tot_class_val.items():
-                print(f"{asset_class:<30}  |  {value:>15,.2f}  |  {value / tot_curr_val:8.2%}")
-            print(f"{'-' * 65}")
 
 
         # REMOVE command.
