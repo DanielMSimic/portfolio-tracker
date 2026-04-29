@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from model import create_asset, get_history, validate_ticker, get_plot_history, sim_gbm_paths
-from view import print_asset_added
+from view import print_asset_added, plot_single_asset, plot_multiple_assets
 
 def run_portfolio_CLI():
     portfolio = []
@@ -351,50 +351,15 @@ def run_portfolio_CLI():
             # Distinguish between single and multiple plots: split multiple (normalised for comparisson between multiple assets) from single (absolute close).
             if len(plot_asset) == 1:
                 # PLOT SINGLE TICKER
-                plt.figure()
                 hist = get_plot_history(plot_asset[0], start_date, end_date)
                 if hist.empty:
-                    print(f"No data available for {plot_assets[0]}.")
+                    print(f"No data available for {plot_asset[0]}.")
                     continue               
-                x_values = hist.index
-                y_values = hist["Close"]
+                plot_single_asset(hist, plot_asset, start_date, end_date)
                 
-                plt.plot(x_values, y_values, label=plot_asset[0], linewidth=2)
-                plt.fill_between(x_values, y_values, alpha=0.1)
-                plt.tight_layout()   
-                plt.title(f"Close price: {plot_asset[0]}", weight='bold')
-                #plt.grid()
-                plt.ylabel("Closing price")
-                plt.legend()
-
-                print()
-                print(f"Figure showing plot for: {plot_asset[0]} over the period {start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}.")
-                plt.show()
-
             else:
                 # PLOTTING MULTIPLE TICKERS
-                plt.figure()
-                for asset in plot_asset:
-                    hist = get_plot_history(asset, start_date, end_date)
-    
-                    if hist.empty:
-                        print(f"No data available for {asset}.")
-                        continue
-                    
-                    x_values = hist.index
-                    y_values = hist["Close"] / hist["Close"].iloc[0]
-                    plt.plot(x_values, y_values, label=asset)
-    
-                plt.tight_layout()
-                #plt.xticks(rotation=45)
-                plt.title(f"Normalised price: {', '.join(plot_asset)}", weight='bold')
-                plt.ylabel("Normalised closing price")
-                #plt.grid()
-                plt.legend()
-
-                print()
-                print(f"Figure showing plot(s) for: {', '.join(plot_asset)} over the period {start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}.")
-                plt.show()
+                plot_multiple_assets(plot_asset, start_date, end_date, get_plot_history)
 
         
         # SIMULATE command.
