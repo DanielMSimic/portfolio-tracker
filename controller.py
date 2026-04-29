@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from model import create_asset, get_history, validate_ticker, get_plot_history, sim_gbm_paths
-from view import print_asset_added, plot_single_asset, plot_multiple_assets
+from view import print_asset_added, plot_single_asset, plot_multiple_assets, print_sim_results, plot_sim_paths, sim_wait_msg, sim_complete_msg
 
 def run_portfolio_CLI():
     portfolio = []
@@ -394,12 +394,12 @@ def run_portfolio_CLI():
             n_steps = 252 * T
             n_paths = 100000
 
-
-            print("Simulating 100,000 GBM paths. This may take some time...")  
-            print()
+            
+            sim_wait_msg()
             sample_paths = sim_gbm_paths(P0, mu, sigma, T, n_steps, n_paths)
-            print("Simulation complete. Simulated 100,000 paths x 3,780 days, generating 378 million draws.")
+            sim_complete_msg()
 
+            
             simulated_values = sample_paths[-1,:]   # Grabbing last element of list with simulated portfolio values. 
 
             # Some stats on the simulated portfolio values.
@@ -408,29 +408,12 @@ def run_portfolio_CLI():
             percentile_5 = np.percentile(simulated_values, 5)
             percentile_95 = np.percentile(simulated_values, 95)
 
-            print(f"\n{'=' * 60}")
-            print(f"  Simulation results portfolio value 15 year forecast")
-            print(f"     Annualised growth rate (μ):   {mu:.2%} ")
-            print(f"     Annualised volatility (σ):    {sigma:.2%} ")
-            print(f"{'=' * 60}")
-            
-            print(f"  Mean predicted portfolio value:      {mean_predicted_pfval:,.2f}")
-            print(f"  Median predicted portfolio value:    {median_predicted_pfval:,.2f}")            
-            print(f"  5th percentile value at risk (VaR):  {percentile_5:,.2f}")          
-            print(f"  95th percentile:                     {percentile_95:,.2f}")   
-            print(f"{'=' * 60}")
+            print_sim_results(mu, sigma, mean_predicted_pfval, median_predicted_pfval, percentile_5, percentile_95)
+            plot_sim_paths(T, n_steps, sample_paths)
 
-            # Plotting GBM paths
-            time_horizon = np.linspace(0, T, n_steps + 1)
-            
-            for path in range(100):
-                plt.plot(time_horizon, sample_paths[:, path])
 
-            plt.title("Simulated paths of portfolio value over 15 years.")
-            plt.xlabel("Years")
-            plt.ylabel("Portfolio value (millions)")
-            plt.gca().yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _:f'{x/1_000_000:,.1f}'))
-            plt.show()
+
+
 
 
 
