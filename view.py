@@ -86,7 +86,7 @@ def plot_sim_paths(T, n_steps, sample_paths):
     for path in range(100):
         plt.plot(time_horizon, sample_paths[:, path])
 
-    plt.title("Simulated paths of portfolio value over 15 years.")
+    plt.title("100 sample paths of portfolio value over 15 years.")
     plt.xlabel("Years")
     plt.ylabel("Portfolio value (millions)")
     plt.gca().yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _:f'{x/1_000_000:,.1f}'))
