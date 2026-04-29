@@ -92,4 +92,25 @@ def calculate_portfolio_tot(portfolio):
         tot_pnl_pct = tot_pnl_abs / tot_cost
 
     return tot_curr_val, tot_cost, tot_pnl_abs, tot_pnl_pct
+
+def calculate_allocation_val(portfolio):
+    tot_sector_val = {}
+    tot_class_val = {}
+
+    for asset in portfolio:
+        sector = asset["Sector"]
+        asset_class = asset["Asset Class"]
+            
+        if sector not in tot_sector_val:
+            tot_sector_val[sector] = 0
+                
+        tot_sector_val[sector] += asset['Current Value']
+                    
+        if asset_class not in tot_class_val:
+            tot_class_val[asset_class] = 0 
+
+        tot_class_val[asset_class] += asset["Current Value"]
+    
+    return tot_sector_val, tot_class_val
+    
     

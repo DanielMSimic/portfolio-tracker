@@ -6,7 +6,7 @@ import matplotlib.ticker as mticker
 
 
 def print_asset_added(asset):
-    print(f"{asset['ticker']} added to portfolio.")
+    print(f"{asset['Ticker']} added to portfolio.")
 
 # PLOTTING SINGLE TICKER
 def plot_single_asset(hist, plot_asset, start_date, end_date):

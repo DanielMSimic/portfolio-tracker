@@ -4,7 +4,7 @@ import datetime
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
-from model import create_asset, get_history, validate_ticker, get_plot_history, sim_gbm_paths, calculate_portfolio_tot
+from model import create_asset, get_history, validate_ticker, get_plot_history, sim_gbm_paths, calculate_portfolio_tot, calculate_allocation_val
 from view import print_asset_added, plot_single_asset, plot_multiple_assets, print_sim_results, plot_sim_paths, sim_wait_msg, sim_complete_msg, print_portfolio, print_allocation
 
 def run_portfolio_CLI():
@@ -142,24 +142,7 @@ def run_portfolio_CLI():
             else:
                 tot_curr_val, _, _, _ = calculate_portfolio_tot(portfolio)
 
-            tot_sector_val = {}
-            tot_class_val = {}
-
-            for asset in portfolio:
-                sector = asset["Sector"]
-                asset_class = asset["Asset Class"]
-            
-                if sector not in tot_sector_val:
-                    tot_sector_val[sector] = 0
-                
-                tot_sector_val[sector] += asset['Current Value']
-                    
-
-                if asset_class not in tot_class_val:
-                    tot_class_val[asset_class] = 0 
-
-                tot_class_val[asset_class] += asset["Current Value"]
-
+            tot_sector_val, tot_class_val = calculate_allocation_val(portfolio)
             print_allocation(tot_sector_val, tot_class_val, tot_curr_val)
 
 
