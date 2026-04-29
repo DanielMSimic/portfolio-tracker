@@ -26,10 +26,12 @@ python3 main.py
 ## Commands
 
 add: add an asset to the portfolio. You will be prompted for ticker, quantity, and purchase price per unit
-	portfolio >> add
-	Enter ticker: AAPL
-	Enter quantity purchased: 10000
-	Enter purchase price per unit: 260
+```
+portfolio >> add
+Enter ticker: AAPL
+Enter quantity purchased: 10000
+Enter purchase price per unit: 260
+```
 
 The CLI will ask you to confirm (y/n) your entry. If (y), the CLI will return a brief confirmation that your asset has been added to the portfolio. 
 
