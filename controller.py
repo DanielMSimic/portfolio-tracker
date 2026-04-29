@@ -215,7 +215,7 @@ def run_portfolio_CLI():
             if len(plot_asset) == 1:
                 # PLOT SINGLE TICKER
                 hist = get_plot_history(plot_asset[0], start_date, end_date)
-                if hist.empty:
+                if hist.empty or hist is None:
                     print(f"No data available for {plot_asset[0]}.")
                     continue               
                 plot_single_asset(hist, plot_asset, start_date, end_date)
@@ -272,15 +272,7 @@ def run_portfolio_CLI():
             percentile_95 = np.percentile(simulated_values, 95)
 
             print_sim_results(mu, sigma, mean_predicted_pfval, median_predicted_pfval, percentile_5, percentile_95)
-            plot_sim_paths(T, n_steps, sample_paths)
-
-
-
-
-
-
-
-        
+            plot_sim_paths(T, n_steps, sample_paths)        
         
         else:
             unknown_command_msg()

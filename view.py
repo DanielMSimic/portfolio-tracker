@@ -33,7 +33,7 @@ def plot_multiple_assets(plot_asset, start_date, end_date, get_plot_history):
     for asset in plot_asset:
         hist = get_plot_history(asset, start_date, end_date)
     
-        if hist.empty:
+        if hist is None or hist.empty:
             print(f"No data available for {asset}.")
             continue
                     
